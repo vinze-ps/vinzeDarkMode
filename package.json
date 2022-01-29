@@ -1,5 +1,27 @@
 {
   "dependencies": {
     "vinzeutilities": "github:vinze-ps/vinzeUtilities"
-  }
+  },
+  "name": "vinzedarkmode",
+  "version": "1.0.0",
+  "description": "The javascript library that allows to automatically change colours on the website to dark equivalents (Dark mode).",
+  "main": "src/js/vinzeDarkMode.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinze-ps/vinzeDarkMode.git"
+  },
+  "keywords": [
+    "javascript",
+    "darkmode"
+  ],
+  "author": "Patryk Surmacz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vinze-ps/vinzeDarkMode/issues"
+  },
+  "homepage": "https://github.com/vinze-ps/vinzeDarkMode#readme"
 }
