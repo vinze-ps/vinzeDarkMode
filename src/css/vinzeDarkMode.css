@@ -1,0 +1,16 @@
+html.vinze-light-mode ::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+html.vinze-light-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+}
+
+html.vinze-dark-mode ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+html.vinze-dark-mode ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.55) !important;
+}
+/*# sourceMappingURL=vinzeDarkMode.css.map */
