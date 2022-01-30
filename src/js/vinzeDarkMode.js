@@ -8,7 +8,7 @@
       : typeof define === "function" && define.amd
       ? define(["vinzeutilities"], factory)
       : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), (global.VinzeDarkMode = factory(root.Vinze)));
-  })(this, function () {
+  })(this, function (Vinze) {
     ("use strict");
 
     var utils;
