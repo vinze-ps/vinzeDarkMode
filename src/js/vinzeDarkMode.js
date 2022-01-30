@@ -4,10 +4,10 @@
 
 (function (global, factory) {
     typeof exports === "object" && typeof module !== "undefined"
-      ? (module.exports = factory())
+      ? (module.exports = factory(require("vinzeutilities")))
       : typeof define === "function" && define.amd
-      ? define(factory)
-      : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), (global.VinzeDarkMode = factory()));
+      ? define(["vinzeutilities"], factory)
+      : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), (global.VinzeDarkMode = factory(root.Vinze)));
   })(this, function () {
     ("use strict");
 
@@ -50,6 +50,7 @@
                 this.properties = utils.objectAssign(Object.create({}), JSON.parse(JSON.stringify(initialProperties)), properties);
                 this.state = {
                     darkMode: false,
+                    changing: false,
                 };
             }
             /**
@@ -125,16 +126,156 @@
                             outlineColor: null,
                         },
                     }));
-                    //* Add hover events
-                    //   this._addHover(_id);
+                    // Add hover events.
+                    this._addHover(_id);
                 }
+            }
+            _addHover(targetId) {
+                let self = this;
+                utils.select(self._getTargetById(targetId).target.element).on("mouseover", function (event) {
+                    if (self.state.darkMode) {
+                        // Remove dark mode class for specific target, for check hover colors.
+                        utils.select(this)
+                            .addClass("vinze-dark-mode-hover-" + targetId)
+                            .addClass("vinze-dark-mode-hover")
+                            .removeClass("vinze-dark-mode-" + targetId);
+                        let color = self._getColor(this);
+                        let savedLightModeColor = self._getTargetById(targetId).target.lightMode;
+                        let savedDarkModeColor = self._getTargetById(targetId).target.darkMode;
+                        let cancelEvent = [];
+                        // If target hasn't hover colors, add dark mode class again.
+                        if (color.background !== null && savedLightModeColor.backgroundColor !== null)
+                            if (color.background[0] == savedLightModeColor.backgroundColor[0] &&
+                                color.background[1] == savedLightModeColor.backgroundColor[1] &&
+                                color.background[2] == savedLightModeColor.backgroundColor[2])
+                                cancelEvent.push(true);
+                            else
+                                cancelEvent.push(false);
+                        else if (color.background === null)
+                            cancelEvent.push(true);
+                        else
+                            cancelEvent.push(false);
+                        if (color.font !== null && savedLightModeColor.color !== null)
+                            if (color.font[0] == savedLightModeColor.color[0] &&
+                                color.font[1] == savedLightModeColor.color[1] &&
+                                color.font[2] == savedLightModeColor.color[2])
+                                cancelEvent.push(true);
+                            else
+                                cancelEvent.push(false);
+                        else if (color.font === null)
+                            cancelEvent.push(true);
+                        else
+                            cancelEvent.push(false);
+                        if (color.border !== null && savedLightModeColor.borderColor !== null)
+                            if (color.border[0] == savedLightModeColor.borderColor[0] &&
+                                color.border[1] == savedLightModeColor.borderColor[1] &&
+                                color.border[2] == savedLightModeColor.borderColor[2])
+                                cancelEvent.push(true);
+                            else
+                                cancelEvent.push(false);
+                        else if (color.border === null)
+                            cancelEvent.push(true);
+                        else
+                            cancelEvent.push(false);
+                        if (color.outline !== null && savedLightModeColor.outlineColor !== null)
+                            if (color.outline[0] == savedLightModeColor.outlineColor[0] &&
+                                color.outline[1] == savedLightModeColor.outlineColor[1] &&
+                                color.outline[2] == savedLightModeColor.outlineColor[2])
+                                cancelEvent.push(true);
+                            else
+                                cancelEvent.push(false);
+                        else if (color.outline === null)
+                            cancelEvent.push(true);
+                        else
+                            cancelEvent.push(false);
+                        if (!cancelEvent.includes(false)) {
+                            utils.select(this)
+                                .removeClass("vinze-dark-mode-hover-" + targetId)
+                                .removeClass("vinze-dark-mode-hover")
+                                .addClass("vinze-dark-mode-" + targetId);
+                            return;
+                        }
+                        // Update hover colors.
+                        let savedDarkModeColorHover = self._getTargetById(targetId).target.darkModeHover;
+                        if (color.background !== null && savedDarkModeColorHover.backgroundColor === null)
+                            self._updateTarget(self._getTargetById(targetId).target).darkModeHover().backgroundColor();
+                        if (color.font !== null && savedDarkModeColorHover.color === null)
+                            self._updateTarget(self._getTargetById(targetId).target).darkModeHover().color();
+                        savedDarkModeColorHover = self._getTargetById(targetId).target.darkModeHover;
+                        // Prepare style for hover.
+                        let css = `.vinze-dark-mode-hover-${targetId} {`;
+                        let newBackgroundColor = savedDarkModeColorHover.backgroundColor || savedDarkModeColor.backgroundColor;
+                        let newColor = savedDarkModeColorHover.color || savedDarkModeColor.color;
+                        let newBorderColor = savedDarkModeColorHover.borderColor || savedDarkModeColor.borderColor;
+                        let newOutlineColor = savedDarkModeColorHover.outlineColor || savedDarkModeColor.outlineColor;
+                        // Background color.
+                        if (newBackgroundColor)
+                            css += `background-color: 
+                          rgba(${newBackgroundColor[0]}, 
+                            ${newBackgroundColor[1]}, 
+                            ${newBackgroundColor[2]}, 
+                            ${newBackgroundColor[3] ? newBackgroundColor[3] : "1"}) !important;`;
+                        // Color.
+                        if (newColor)
+                            css += `color: 
+                          rgba(${newColor[0]}, 
+                            ${newColor[1]}, 
+                            ${newColor[2]}, 
+                            ${newColor[3] ? newColor[3] : "1"}) !important;`;
+                        // Border color.
+                        if (newBorderColor)
+                            css += `border-color: 
+                          rgba(${newBorderColor[0]}, 
+                            ${newBorderColor[1]}, 
+                            ${newBorderColor[2]}, 
+                            ${newBorderColor[3] ? newBorderColor[3] : "1"}) !important;`;
+                        // Outline color.
+                        if (newOutlineColor)
+                            css += `outline-color: 
+                          rgba(${newOutlineColor[0]}, 
+                            ${newOutlineColor[1]}, 
+                            ${newOutlineColor[2]}, 
+                            ${newOutlineColor[3] ? newOutlineColor[3] : "1"}) !important;`;
+                        css += `}`;
+                        // Create style element.
+                        var head = document.head || document.getElementsByTagName("head")[0], style = document.createElement("style");
+                        head.appendChild(style);
+                        style.type = "text/css";
+                        style.id = "vinze-dark-mode-style-hover";
+                        //   if (style.styleSheet) {
+                        //     // This is required for IE8 and below.
+                        //     style.styleSheet.cssText = css;
+                        //   } else {
+                        style.appendChild(document.createTextNode(css));
+                        //   }
+                    }
+                }, false);
+                utils.select(self._getTargetById(targetId).target.element).on("mouseout", function (event) {
+                    utils.select("#vinze-dark-mode-style-hover").remove();
+                    if (self.state.darkMode) {
+                        utils.select(this)
+                            .removeClass("vinze-dark-mode-hover-" + targetId)
+                            .removeClass("vinze-dark-mode-hover")
+                            .addClass("vinze-dark-mode-" + targetId);
+                    }
+                    else {
+                        utils.select(this)
+                            .removeClass("vinze-dark-mode-hover-" + targetId)
+                            .removeClass("vinze-dark-mode-hover")
+                            .removeClass("vinze-dark-mode-" + targetId);
+                    }
+                }, true);
             }
             /**
              * Changes dark mode.
              * @param darkMode
-             * @param manually Determinates whether change of dark mode
+             * @param manualChange Determinates whether change of dark mode
              */
-            _changeMode(darkMode = null, manually = false) {
+            _changeMode(darkMode = null, manualChange = false) {
+                // Cancel change if the changing state is true.
+                if (this.state.changing)
+                    return;
+                this.state.changing = true;
                 this.state.darkMode = darkMode || !this.state.darkMode;
                 // Updates the dark mode cookies state.
                 if (this.properties.saveToCookies)
@@ -151,7 +292,7 @@
                     // Remove dark mode hover style element.
                     utils.select("#vinze-dark-mode-style-hover").remove();
                 }
-                this.update(null, true, false);
+                this.update(null, true, manualChange);
             }
             _updateTarget(target) {
                 let self = this;
@@ -266,7 +407,11 @@
                         utils.select(target.element).addClass(`vinze-dark-mode-easing`);
                         utils.timeout("set", "vinze-dark-mode-easing", self.properties.transitionDuration, () => {
                             utils.select(target.element).removeClass(`vinze-dark-mode-easing`);
+                            self.state.changing = false;
                         });
+                    }
+                    else {
+                        self.state.changing = false;
                     }
                     //* Toggle style class.
                     if (self.state.darkMode)
@@ -399,6 +544,18 @@
                 } while (exists);
                 return newId;
             }
+            _getTargetById(id = null) {
+                if (id) {
+                    for (let i = 0; i <= this.targets.length - 1; i++) {
+                        if (this.targets[i].id === id)
+                            return { index: i, target: this.targets[i] };
+                    }
+                    return { index: -1, target: null };
+                }
+                else
+                    return { index: -1, target: null };
+                ;
+            }
             /**
              * @param element HTML element.
              * @returns Object with colors of the HTML element.
@@ -481,6 +638,7 @@
                         if (!rgba)
                             return null;
                         // Ignore elements.
+                        includeSmallElements = false;
                         if (
                         // Element cannot be ignored.
                         uElement.attr("data-vinze-dark-mode") !== "true" &&
@@ -690,7 +848,7 @@
              * Manually toggles dark mode.
              */
             toggle() {
-                this._changeMode(null, false);
+                this._changeMode(null, true);
                 // On toggle event.
                 if (typeof this.onToggle === "function")
                     this.onToggle(this.state);
