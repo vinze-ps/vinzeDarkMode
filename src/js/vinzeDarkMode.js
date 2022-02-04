@@ -7,7 +7,7 @@
       ? (module.exports = factory(require("vinzeutilities")))
       : typeof define === "function" && define.amd
       ? define(["vinzeutilities"], factory)
-      : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), (global.VinzeDarkMode = factory(root.Vinze)));
+      : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), (global.VinzeDarkMode = factory(global.Vinze)));
   })(this, function (Vinze) {
     ("use strict");
 
